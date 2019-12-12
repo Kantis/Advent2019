@@ -1,5 +1,11 @@
 import java.lang.RuntimeException
-import kotlin.math.abs
+import java.util.*
+import kotlin.collections.HashSet
+
+data class Path (
+    val visitedPoints: Set<Point>,
+    val stepsToPoint: Map<Point, Int>
+)
 
 data class Point(
     val x: Int,
@@ -8,26 +14,43 @@ data class Point(
 
 operator fun Point.plus(other: Point) = Point(x + other.x, y + other.y)
 
-fun firstIntersection(pathOne: Set<Point>, pathTwo: Set<Point>): Point? {
-    return pathOne.intersect(pathTwo)
-        .minBy { p -> abs(p.x) + abs(p.y) }
+
+fun minStepsToIntersect(pathOne: Path, pathTwo: Path): Int {
+    val intersectingPoints = pathOne.visitedPoints.intersect(pathTwo.visitedPoints)
+    var minDistance: Int? = null
+
+    for (i in intersectingPoints) {
+        val pointDistance = pathOne.stepsToPoint[i]!! + pathTwo.stepsToPoint[i]!!
+        if (minDistance == null || minDistance > pointDistance) {
+            minDistance = pointDistance
+        }
+    }
+
+    return minDistance ?: 0
 }
 
-fun toPoints(path: String): Set<Point> {
+fun toPath(path: String): Path {
     var currentPoint = Point(0, 0)
     val points = HashSet<Point>()
+    val pointDistances = HashMap<Point, Int>()
+    var stepsUsed = 0
 
     for (moves in path.split(",")) {
         val direction = translate(moves[0])
         val repetitions = moves.substring(1).toInt()
 
         for (i in 0 until repetitions) {
+            stepsUsed++
             currentPoint += direction
+
+            if (!pointDistances.contains(currentPoint))
+                pointDistances[currentPoint] = stepsUsed
+
             points.add(currentPoint)
         }
     }
 
-    return points
+    return Path(points, pointDistances)
 }
 
 fun translate(direction: Char): Point {
