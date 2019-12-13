@@ -36,7 +36,7 @@ fun toPath(path: String): Path {
     var stepsUsed = 0
 
     for (moves in path.split(",")) {
-        val direction = translate(moves[0])
+        val direction = resolveOperand(moves[0])
         val repetitions = moves.substring(1).toInt()
 
         for (i in 0 until repetitions) {
@@ -53,7 +53,7 @@ fun toPath(path: String): Path {
     return Path(points, pointDistances)
 }
 
-fun translate(direction: Char): Point {
+fun resolveOperand(direction: Char): Point {
     return when (direction) {
         'U' -> Point(0, 1)
         'D' -> Point(0, -1)

@@ -8,10 +8,10 @@ fun main() {
             programInstance[1] = i
             programInstance[2] = j
 
-            if (Intcode(programInstance)[0] == 19690720) {
-                println("Noun: ${i}, Verb: ${j}")
-                break
-            }
+//            if (Intcode(programInstance)[0] == 19690720) {
+//                println("Noun: ${i}, Verb: ${j}")
+//                break
+//            }
         }
     }
 
