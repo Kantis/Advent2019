@@ -1,3 +1,4 @@
+import java.util.*
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -10,7 +11,7 @@ fun main() {
         { println(it) }
     )
 
-    cpu.evaluate()
+//    cpu.evaluate()
 }
 
 enum class AddressingMode {
@@ -18,13 +19,21 @@ enum class AddressingMode {
     Immediate
 }
 
-class IntcodeComputer(private val program: Array<Int>, val inputFunction: () -> Int, val outputFunction: (Int) -> Unit) {
+class IntcodeComputer(
+    private val program: Array<Int>,
+    val inputFunction: suspend () -> Int,
+    val outputFunction: (Int) -> Unit
+) {
 
     private var programCounter: Int = 0
+    private val uuid = UUID.randomUUID()
 
-    fun evaluate(): Array<Int> {
+    suspend fun evaluate(): Array<Int> {
         while (programCounter < program.size) {
-            if (program[programCounter] == 99) break
+            if (program[programCounter] == 99) {
+//                println("$uuid Finished!")
+                break
+            }
 
             val opCode = program[programCounter]
             val args = resolveParameters(opCode)
@@ -43,8 +52,9 @@ class IntcodeComputer(private val program: Array<Int>, val inputFunction: () -> 
                 else -> return program
             }
 
-            if (programCounter == preOpProgramCounter)
+            if (programCounter == preOpProgramCounter) {
                 programCounter += 1 + args.size
+            }
         }
 
         return program
@@ -80,7 +90,7 @@ class IntcodeComputer(private val program: Array<Int>, val inputFunction: () -> 
     private fun resolveAddressingModes(opCode: Int, paramCount: Int): List<AddressingMode> {
         val addressingModes = opCode / 100
         return (0 until paramCount)
-            .map { addressingModes / 10.0.pow(it).roundToInt() % 10 }
+            .map { addressingModes / intPow(10, it) % 10 }
             .map { if (it == 1) AddressingMode.Immediate else AddressingMode.Position }
     }
 
@@ -89,6 +99,15 @@ class IntcodeComputer(private val program: Array<Int>, val inputFunction: () -> 
         return program[operand]
     }
 
+}
+
+fun intPow(base: Int, exp: Int): Int {
+    if (exp == 0) return 1
+    var result = base
+    for (i in 1 until exp) {
+        result *= base
+    }
+    return result
 }
 
 //fun <S, T> pairLists(l1: List<S>, l2: List<T>): List<Pair<S, T>> {
