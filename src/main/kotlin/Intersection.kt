@@ -12,7 +12,9 @@ data class Point(
     val y: Int
 )
 
-operator fun Point.plus(other: Point) = Point(x + other.x, y + other.y)
+public operator fun Point.plus(other: Point) = Point(x + other.x, y + other.y)
+
+public operator fun Point.minus(other: Point) = Point(x - other.x, y - other.y)
 
 
 fun minStepsToIntersect(pathOne: Path, pathTwo: Path): Int {
